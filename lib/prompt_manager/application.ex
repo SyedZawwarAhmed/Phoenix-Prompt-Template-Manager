@@ -1,22 +1,18 @@
 defmodule PromptManager.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
-  @moduledoc false
-
   use Application
 
   @impl true
   def start(_type, _args) do
     children = [
+      # Start the Telemetry supervisor
       PromptManagerWeb.Telemetry,
-      {DNSCluster, query: Application.get_env(:prompt_manager, :dns_cluster_query) || :ignore},
+      # Start the PubSub system
       {Phoenix.PubSub, name: PromptManager.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: PromptManager.Finch},
+      # Start the Endpoint (http/https)
+      PromptManagerWeb.Endpoint,
       # Start a worker by calling: PromptManager.Worker.start_link(arg)
-      # {PromptManager.Worker, arg},
-      # Start to serve requests, typically the last entry
-      PromptManagerWeb.Endpoint
+      # {PromptManager.Worker, arg}
+      {PromptManager.TemplateStore, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
